@@ -10,6 +10,9 @@ import android.media.MediaPlayer;
 
 import androidx.documentfile.provider.DocumentFile;
 import android.media.audiofx.Equalizer;
+import android.text.TextUtils;
+import android.widget.Toast;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -48,7 +51,12 @@ public class StaticWorks {
         }
         //add current song to songsBefore
         songsBefore[songsBefore.length - 2] = songPlay;
-        songsBefore[songsBefore.length - 1] = (int) (1000 * mediaPlayer.getCurrentPosition() / mediaPlayer.getDuration());
+        int duration = mediaPlayer.getDuration();
+        if(duration == 0 || duration == -1){
+            songsBefore[songsBefore.length - 1] = 0;
+        }else {
+            songsBefore[songsBefore.length - 1] = (int) (1000 * mediaPlayer.getCurrentPosition() / duration);
+        }
         //find next song to play
         songPlay = currentBrain.compute(songsBefore);
         playingSongString = filesList.get(songPlay).getName();
@@ -65,6 +73,7 @@ public class StaticWorks {
         StaticWorks.mediaPlayer.setOnCompletionListener(new MainActivity.MyCompletionListener());
         StaticWorks.activity.setSongPlayingLabel();
     }
+    static Toast toastMutated;
     public static void skipSong(){
         currentBrain.songSkips++;
         if(currentBrain.songSkips >= 4){
@@ -72,6 +81,7 @@ public class StaticWorks {
                 //check if improved //if improved set as new good brain
                 if(mutatedBrain.songPlays > goodBrain.songPlays){//if mutation had more plays
                     System.out.println("mutated network won and became good network");
+                    toastMutated.show();
                     goodBrain = mutatedBrain;//set as good brain
                 }else{
                     System.out.println("good network won");
@@ -96,9 +106,13 @@ public class StaticWorks {
     static MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
 
     public static void findSong() {
-        System.out.println("SKIPPING UNTIL FOUND SONG");
         int findIndex = 0;
         String findThisString = activity.editTextSearch.getText().toString();
+        //System.out.println("findThisString: "+findThisString);
+        if(TextUtils.isEmpty(activity.editTextSearch.getText().toString())){
+            //System.out.println("returning");
+            return;
+        }
         if(beforeSearchString.equals(findThisString)){
             findIndex = beforeSearchIndex + 1;
         }
@@ -129,6 +143,7 @@ public class StaticWorks {
             //System.out.println("found "+songPaths.get(findIndex).toString());
             //found something at findIndex in songPaths
             //songPlayingLabel.setText("loading...");
+            System.out.println("SKIPPING UNTIL FOUND SONG");
             skipUntilFound(findThisString);
         }else{
             beforeSearchIndex = 0;
@@ -231,5 +246,58 @@ public class StaticWorks {
         equalizer.setBandLevel((short)3, (short)(-10   * bassAmount));
         equalizer.setBandLevel((short)4, (short)(-10   * bassAmount));
 
+    }
+
+    public static void findSongFast() {
+        System.out.println("FIND SONG FAST");
+        int findIndex = 0;
+        String findThisString = activity.editTextSearch.getText().toString();
+        if(beforeSearchString.equals(findThisString)){
+            findIndex = beforeSearchIndex + 1;
+        }
+        DocumentFile foundSongPath = null;
+        for(;findIndex < filesList.size();findIndex++){
+            if(filesList.get(findIndex).getName().toLowerCase().contains(findThisString.toLowerCase())){
+                foundSongPath = filesList.get(findIndex);
+                break;
+            }
+        }
+        if(foundSongPath != null){
+            for(int i = 0;i < songsBefore.length - 2;i++){
+                songsBefore[i] = songsBefore[i + 2];
+            }
+            //add current song to songsBefore
+            songsBefore[songsBefore.length - 2] = songPlay;
+            int duration = mediaPlayer.getDuration();
+            if(duration == 0 || duration == -1){
+                songsBefore[songsBefore.length - 1] = 0;
+            }else {
+                songsBefore[songsBefore.length - 1] = (int) (1000 * mediaPlayer.getCurrentPosition() / duration);
+            }
+            songPlay = findIndex;
+            beforeSearchIndex = findIndex;
+            beforeSearchString = findThisString;
+            //play song
+            mediaPlayer.stop();
+            playingSongString = foundSongPath.getName();
+            mediaPlayer.reset();
+            try {
+                mediaPlayer.setDataSource(context,filesList.get(songPlay).getUri());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            mediaPlayer.prepareAsync();
+            mediaPlayer.setOnPreparedListener((listener)-> {
+                StaticWorks.mediaPlayer.start();
+            });
+            StaticWorks.mediaPlayer.setOnCompletionListener(new MainActivity.MyCompletionListenerForFindSongFast());
+            activity.setSongPlayingLabel();
+            activity.buttonPause.setText("pause");
+            paused = false;
+
+        }else{
+            beforeSearchIndex = 0;
+            beforeSearchString = "";
+        }
     }
 }

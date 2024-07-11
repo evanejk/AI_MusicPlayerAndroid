@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity() {
                     if(uri != null){
                         val docFile: DocumentFile =
                             DocumentFile.fromTreeUri(applicationContext,uri)!!
+                        StaticWorks.filesList.clear()
                         for (listFile in docFile.listFiles()) {
                             //System.out.println(listFile.uri.toString())
                             try{

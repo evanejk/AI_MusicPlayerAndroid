@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 public class StaticWorks {
-    static LinkedList<DocumentFile> filesList = new LinkedList<DocumentFile>();
+    static LinkedList<SongFile> filesList = new LinkedList<SongFile>();
     static int[] songsBefore = new int[100];
     static int songPlay = 0;
     static String playingSongString = "";
@@ -59,10 +59,10 @@ public class StaticWorks {
         }
         //find next song to play
         songPlay = currentBrain.compute(songsBefore);
-        playingSongString = filesList.get(songPlay).getName();
+        playingSongString = filesList.get(songPlay).file.getName();
         StaticWorks.mediaPlayer.reset();
         try {
-            StaticWorks.mediaPlayer.setDataSource(StaticWorks.context, StaticWorks.filesList.get(StaticWorks.songPlay).getUri());
+            StaticWorks.mediaPlayer.setDataSource(StaticWorks.context, StaticWorks.filesList.get(StaticWorks.songPlay).file.getUri());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -118,23 +118,10 @@ public class StaticWorks {
         }
         boolean foundSomething = false;
         for(;findIndex < filesList.size();findIndex++){
-            String artistName = null;
-            try {
-                mediaMetadataRetriever.setDataSource(context, filesList.get(findIndex).getUri());
-                artistName = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-            }catch(Exception e){
-                System.out.println("Error getting metadate from song? file "+filesList.get(findIndex).getName());
-                activity.textViewSongName.setText("Error getting metadate from song? file "+filesList.get(findIndex).getName());
-            }
-            if(filesList.get(findIndex).getName().toLowerCase().contains(findThisString.toLowerCase())){
+            if(filesList.get(findIndex).file.getName().toLowerCase().contains(findThisString.toLowerCase()) ||
+                    filesList.get(findIndex).artistName.toLowerCase().contains(findThisString.toLowerCase())){
                 foundSomething = true;
                 break;
-            }
-            if(artistName != null){
-              if(artistName.toLowerCase().contains(findThisString.toLowerCase())){
-                  foundSomething = true;
-                  break;
-              }
             }
         }
         if(foundSomething){
@@ -168,6 +155,7 @@ public class StaticWorks {
                     //check if improved //if improved set as new good brain
                     if(mutatedBrain.songPlays > goodBrain.songPlays){//if mutation had more plays
                         goodBrain = mutatedBrain;//set as good brain
+                        toastMutated.show();
                     }
                     currentBrain = goodBrain;
                     //reset brain stats
@@ -192,9 +180,8 @@ public class StaticWorks {
             }
             //find next song to play
             songPlay = AI.currentBrain.compute(songsBefore);
-            playingSongString = filesList.get(songPlay).getName();
-            mediaMetadataRetriever.setDataSource(context,filesList.get(songPlay).getUri());
-            artistName = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+            playingSongString = filesList.get(songPlay).file.getName();
+            artistName = filesList.get(songPlay).artistName;
         }
         System.out.println("Took "+totalSkipsToFindSong+" skips to find song.");
         if(currentBrain == goodBrain){
@@ -204,7 +191,7 @@ public class StaticWorks {
         }
         mediaPlayer.reset();
         try {
-            mediaPlayer.setDataSource(context,filesList.get(songPlay).getUri());
+            mediaPlayer.setDataSource(context,filesList.get(songPlay).file.getUri());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -257,8 +244,8 @@ public class StaticWorks {
         }
         DocumentFile foundSongPath = null;
         for(;findIndex < filesList.size();findIndex++){
-            if(filesList.get(findIndex).getName().toLowerCase().contains(findThisString.toLowerCase())){
-                foundSongPath = filesList.get(findIndex);
+            if(filesList.get(findIndex).file.getName().toLowerCase().contains(findThisString.toLowerCase())){
+                foundSongPath = filesList.get(findIndex).file;
                 break;
             }
         }
@@ -282,7 +269,7 @@ public class StaticWorks {
             playingSongString = foundSongPath.getName();
             mediaPlayer.reset();
             try {
-                mediaPlayer.setDataSource(context,filesList.get(songPlay).getUri());
+                mediaPlayer.setDataSource(context,filesList.get(songPlay).file.getUri());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

@@ -78,21 +78,12 @@ class MainActivity : AppCompatActivity() {
                                 var artistName = StaticWorks.mediaMetadataRetriever.extractMetadata(
                                     MediaMetadataRetriever.METADATA_KEY_ARTIST
                                 )
-                                StaticWorks.filesList.add(listFile)
+                                StaticWorks.filesList.add(SongFile(listFile,artistName))
                             }catch(e: Exception){
                                 println("can not load file for mediaPlayer: "+listFile.uri.toString())
                             }
                         }
-                        //test media player
-                        //val mediaPlayer = MediaPlayer()
-                        //mediaPlayer.setDataSource(applicationContext, filesList.first.uri)
-                        //mediaPlayer.prepare()
-                        //mediaPlayer.setOnPreparedListener {
-                        //    mediaPlayer.start()
-                        //}
-                        //mediaPlayer.setOnCompletionListener {
-                        //    mediaPlayer.release()
-                        //}
+
                         AI.load(applicationContext)
                         //make up songs listened to before
 
@@ -256,8 +247,8 @@ class MainActivity : AppCompatActivity() {
                 return
             }
             StaticWorks.mediaPlayer = MediaPlayer()
-            StaticWorks.playingSongString = StaticWorks.filesList.get(StaticWorks.songPlay).name
-            StaticWorks.mediaPlayer.setDataSource(applicationContext, StaticWorks.filesList.get(StaticWorks.songPlay).uri)
+            StaticWorks.playingSongString = StaticWorks.filesList.get(StaticWorks.songPlay).file.name
+            StaticWorks.mediaPlayer.setDataSource(applicationContext, StaticWorks.filesList.get(StaticWorks.songPlay).file.uri)
             StaticWorks.mediaPlayer.prepareAsync()
             StaticWorks.mediaPlayer.setOnPreparedListener {
                 StaticWorks.mediaPlayer.start()

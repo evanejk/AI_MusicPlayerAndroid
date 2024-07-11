@@ -28,8 +28,8 @@ import com.happynicetime.ai_musicplayerandroid.StaticWorks.mediaPlayer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlin.random.Random
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
     private lateinit var serviceIntent: Intent
@@ -78,7 +78,11 @@ class MainActivity : AppCompatActivity() {
                                 var artistName = StaticWorks.mediaMetadataRetriever.extractMetadata(
                                     MediaMetadataRetriever.METADATA_KEY_ARTIST
                                 )
+                                if (artistName == null) {
+                                    artistName = ""
+                                }
                                 StaticWorks.filesList.add(SongFile(listFile,artistName))
+
                             }catch(e: Exception){
                                 println("can not load file for mediaPlayer: "+listFile.uri.toString())
                             }

@@ -1,0 +1,3 @@
+Make a folder with your music files then use browse to select the music folder and it will smart shuffle and play songs while running in the background as a service. Playback will start immediately after selecting the music folder and loading completes. It might be loud depending on your volume setting.
+
+Using find song skips songs until it finds a matching song name or artist name so it can take many skips but it's worth it because it will train the AI to find the song faster in the future. Normally I like to find an artist name and it will skip songs until it finds any song by that artist. After doing that for a while it seems to learn how to shuffle pretty good on its own.

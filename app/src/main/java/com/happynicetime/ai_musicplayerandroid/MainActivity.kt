@@ -255,6 +255,9 @@ class MainActivity : AppCompatActivity() {
             StaticWorks.mediaPlayer.setDataSource(applicationContext, StaticWorks.filesList.get(StaticWorks.songPlay).file.uri)
             StaticWorks.mediaPlayer.prepareAsync()
             StaticWorks.mediaPlayer.setOnPreparedListener {
+                StaticWorks.setupEqualizer()
+                StaticWorks.activity.buttonPause.text = "pause"
+                StaticWorks.paused = false
                 StaticWorks.mediaPlayer.start()
             }
             StaticWorks.mediaPlayer.setOnCompletionListener(MyCompletionListener())

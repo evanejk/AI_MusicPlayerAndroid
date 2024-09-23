@@ -100,7 +100,7 @@ public class StaticWorks {
         }
         playNextSong();
         activity.setSongPlayingLabel();
-        //pc.pauseSongButton.setText("Pause");
+        activity.buttonPause.setText("pause");
         paused = false;
     }
     static MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
@@ -222,7 +222,7 @@ public class StaticWorks {
     }
 
     static Equalizer equalizer;
-    private static void setupEqualizer() {
+    static void setupEqualizer() {
         int audioSessionId = mediaPlayer.getAudioSessionId();
         equalizer = new Equalizer(0, audioSessionId);
         equalizer.setEnabled(true);

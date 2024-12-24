@@ -23,6 +23,7 @@ public class StaticWorks {
     static int[] songsBefore = new int[100];
     static int songPlay = 0;
     static String playingSongString = "";
+    static String playingSongArtist = "";
 
     static MainActivity activity;
     static MediaPlayer mediaPlayer = new MediaPlayer();
@@ -55,11 +56,12 @@ public class StaticWorks {
         if(duration == 0 || duration == -1){
             songsBefore[songsBefore.length - 1] = 0;
         }else {
-            songsBefore[songsBefore.length - 1] = (int) (1000 * mediaPlayer.getCurrentPosition() / duration);
+            songsBefore[songsBefore.length - 1] = (int) (Integer.MAX_VALUE * mediaPlayer.getCurrentPosition() / duration);
         }
         //find next song to play
         songPlay = currentBrain.compute(songsBefore);
         playingSongString = filesList.get(songPlay).file.getName();
+        playingSongArtist = filesList.get(songPlay).artistName;
         StaticWorks.mediaPlayer.reset();
         try {
             StaticWorks.mediaPlayer.setDataSource(StaticWorks.context, StaticWorks.filesList.get(StaticWorks.songPlay).file.getUri());
@@ -175,12 +177,13 @@ public class StaticWorks {
             if(didntPlaySong){
                 songsBefore[songsBefore.length - 1] = 0;
             }else{
-                songsBefore[songsBefore.length - 1] = (int) (1000 * mediaPlayer.getCurrentPosition() / mediaPlayer.getDuration());
+                songsBefore[songsBefore.length - 1] = (int) (Integer.MAX_VALUE * mediaPlayer.getCurrentPosition() / mediaPlayer.getDuration());
                 didntPlaySong = true;
             }
             //find next song to play
             songPlay = AI.currentBrain.compute(songsBefore);
             playingSongString = filesList.get(songPlay).file.getName();
+            playingSongArtist = filesList.get(songPlay).artistName;
             artistName = filesList.get(songPlay).artistName;
         }
         System.out.println("Took "+totalSkipsToFindSong+" skips to find song.");
@@ -243,9 +246,11 @@ public class StaticWorks {
             findIndex = beforeSearchIndex + 1;
         }
         DocumentFile foundSongPath = null;
+        SongFile songFileFound = null;
         for(;findIndex < filesList.size();findIndex++){
             if(filesList.get(findIndex).file.getName().toLowerCase().contains(findThisString.toLowerCase())){
-                foundSongPath = filesList.get(findIndex).file;
+                songFileFound = filesList.get(findIndex);
+                foundSongPath = songFileFound.file;
                 break;
             }
         }
@@ -259,14 +264,15 @@ public class StaticWorks {
             if(duration == 0 || duration == -1){
                 songsBefore[songsBefore.length - 1] = 0;
             }else {
-                songsBefore[songsBefore.length - 1] = (int) (1000 * mediaPlayer.getCurrentPosition() / duration);
+                songsBefore[songsBefore.length - 1] = (int) (Integer.MAX_VALUE * mediaPlayer.getCurrentPosition() / duration);
             }
             songPlay = findIndex;
             beforeSearchIndex = findIndex;
             beforeSearchString = findThisString;
             //play song
             mediaPlayer.stop();
-            playingSongString = foundSongPath.getName();
+            playingSongString = filesList.get(songPlay).file.getName();
+            playingSongArtist = filesList.get(songPlay).artistName;
             mediaPlayer.reset();
             try {
                 mediaPlayer.setDataSource(context,filesList.get(songPlay).file.getUri());

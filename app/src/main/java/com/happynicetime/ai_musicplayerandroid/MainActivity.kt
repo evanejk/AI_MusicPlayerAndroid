@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                         startedMediaPlayer = true
                         scope.launch {
                             while (mediaPlayer != null) {
-                                delay(2000)  // Delay for 1 second
+                                delay(2000)  // Delay for 2 second
                                 runOnUiThread {
                                     if (mediaPlayer?.isPlaying == true) {
                                         if(mediaPlayer.duration == 0 || mediaPlayer.duration == -1){
@@ -202,7 +202,7 @@ class MainActivity : AppCompatActivity() {
                     val skipSongPendingIntent =
                         PendingIntent.getService(this, 0, skipSongIntent, PendingIntent.FLAG_IMMUTABLE)
                     val skipSongAction: NotificationCompat.Action = NotificationCompat.Action(
-                        R.drawable.baseline_arrow_forward_50,  // skip icon resource
+                        R.drawable.baseline_music_note_24,  // skip icon resource
                         "Skip Song",
                         skipSongPendingIntent
                     )
@@ -252,6 +252,7 @@ class MainActivity : AppCompatActivity() {
             }
             StaticWorks.mediaPlayer = MediaPlayer()
             StaticWorks.playingSongString = StaticWorks.filesList.get(StaticWorks.songPlay).file.name
+            StaticWorks.playingSongArtist = StaticWorks.filesList.get(StaticWorks.songPlay).artistName
             StaticWorks.mediaPlayer.setDataSource(applicationContext, StaticWorks.filesList.get(StaticWorks.songPlay).file.uri)
             StaticWorks.mediaPlayer.prepareAsync()
             StaticWorks.mediaPlayer.setOnPreparedListener {
@@ -266,7 +267,7 @@ class MainActivity : AppCompatActivity() {
 
     }
     fun setSongPlayingLabel() {
-        textViewSongName.setText(StaticWorks.playingSongString)
+        textViewSongName.setText(StaticWorks.playingSongString+"\n"+"by "+StaticWorks.playingSongArtist)
         if(AI.currentBrain == AI.goodBrain){
             textViewInfo.setText("good network")
         }else if(AI.currentBrain == AI.mutatedBrain){
